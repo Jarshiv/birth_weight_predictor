@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Birth Weight Predictor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            border-left: 4px solid #667eea;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-title {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .result-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .result-unit {
+            color: #999;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .success-icon {
+            color: #4caf50;
+            margin-right: 10px;
+        }
+
+        .error-container {
+            margin-top: 20px;
+            padding: 15px;
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+            border-radius: 4px;
+            color: #c62828;
+            display: none;
+            font-size: 14px;
+        }
+
+        .error-container.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👶 Baby Birth Weight Predictor</h1>
+            <p>Predict your baby's birth weight based on health metrics</p>
+        </div>
+
+        <div class="info-box">
+            💡 Enter the baby's health information to get a weight prediction
+        </div>
+
+        <form id="predictionForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="age">Age (months)</label>
+                    <input type="number" id="age" name="age" placeholder="e.g., 9" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="weight">Current Weight (kg)</label>
+                    <input type="number" id="weight" name="weight" placeholder="e.g., 75" step="0.1" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="height">Height (cm)</label>
+                    <input type="number" id="height" name="height" placeholder="e.g., 165" step="0.1" required>
+                </div>
+                <div class="form-group">
+                    <label for="head_circumference">Head Circumference (cm)</label>
+                    <input type="number" id="head_circumference" name="head_circumference" placeholder="e.g., 35" step="0.1" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender" required>
+                    <option value="">-- Select Gender --</option>
+                    <option value="0">Female</option>
+                    <option value="1">Male</option>
+                </select>
+            </div>
+
+            <button type="submit">Predict Birth Weight</button>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing data...</p>
+            </div>
+        </form>
+
+        <div class="error-container" id="errorContainer"></div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="result-title">
+                <span class="success-icon">✓</span>Predicted Birth Weight
+            </div>
+            <div>
+                <span class="result-value" id="predictionResult">--</span>
+                <span class="result-unit">kg</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('predictionForm');
+        const resultContainer = document.getElementById('resultContainer');
+        const errorContainer = document.getElementById('errorContainer');
+        const loadingSpinner = document.getElementById('loading');
+        const predictionResult = document.getElementById('predictionResult');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Clear previous results and errors
+            resultContainer.classList.remove('show');
+            errorContainer.classList.remove('show');
+            loadingSpinner.classList.add('show');
+
+            // Collect form data
+            const formData = {
+                age: parseFloat(document.getElementById('age').value),
+                weight: parseFloat(document.getElementById('weight').value),
+                height: parseFloat(document.getElementById('height').value),
+                head_circumference: parseFloat(document.getElementById('head_circumference').value),
+                gender: parseInt(document.getElementById('gender').value)
+            };
+
+            try {
+                // Send prediction request
+                const response = await fetch('http://localhost:5000/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify([formData])
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Display result
+                loadingSpinner.classList.remove('show');
+                predictionResult.textContent = data.prediction || data[0] || 'N/A';
+                resultContainer.classList.add('show');
+
+            } catch (error) {
+                loadingSpinner.classList.remove('show');
+                errorContainer.textContent = `⚠️ Error: ${error.message}. Make sure the server is running on http://localhost:5000`;
+                errorContainer.classList.add('show');
+                console.error('Prediction error:', error);
+            }
+        });
+
+        // Bonus: Auto-submit for demo (remove in production)
+        // Uncomment to test with sample data
+        /*
+        window.addEventListener('load', () => {
+            document.getElementById('age').value = 9;
+            document.getElementById('weight').value = 75;
+            document.getElementById('height').value = 165;
+            document.getElementById('head_circumference').value = 35;
+            document.getElementById('gender').value = 1;
+        });
+        */
+    </script>
+</body>
+</html>
